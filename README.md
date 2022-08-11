@@ -60,11 +60,11 @@ WantedBy=battery.service
 ```
 HOOKS=(base systemd resume autodetect modconf block filesystems keyboard fsck)
 ```
-9. Then type
+9. Then type in terminal
 ```
 mkinitcpio -P
 ```
-11. Last, type this in terminal
+11. Last, type this too.
 ```
 systemctl enable --now battery.{service,timer}
 ```
