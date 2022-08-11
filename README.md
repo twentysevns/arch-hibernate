@@ -1,6 +1,6 @@
 # arch-hibernate
-automatic hibernate with systemd timer
-1. create file in `/usr/local/bin/hibernate.sh`
+Automatic hibernate with systemd timer
+1. Create file in `/usr/local/bin/hibernate.sh`
 ```
 #!/bin/bash
 
@@ -11,7 +11,7 @@ automatic hibernate with systemd timer
         fi
 )
 ```
-2. create file in `/etc/systemd/system/battery.service`
+2. Create file in `/etc/systemd/system/battery.service`
 ```
 [Unit]
 Description=Automatic hibernate
@@ -22,7 +22,7 @@ ExecStart=/usr/local/bin/hibernate.sh
 User=root
 Group=systemd-journal
 ```
-3. create file in `/etc/systemd/system/battery.timer`
+3. Create file in `/etc/systemd/system/battery.timer`
 ```
 [Unit]
 Description=Periodical checking of battery status every two minutes
@@ -33,4 +33,8 @@ OnUnitActiveSec=2min
 
 [Install]
 WantedBy=battery.service
+```
+4. Then type this in terminal, run with root privilage.
+```
+systemctl enable --now battery.service; systemctl enable --now battery.timer
 ```
