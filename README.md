@@ -22,18 +22,31 @@ mkswap /swap ; swapon /swap
 # swap in /swap
 /swap          none  swap  defaults     0 0
 ```
-5. Create file in `/usr/local/bin/hibernate.sh`
+
+5. Type `filefrag -v /swap | awk '$1=="0:" {print substr($4, 1, length($4)-2)}'`
+```
+6391808
+```
+6. Put the result to `/boot/loader/entries/[your_configuration_file].conf` in `options` line with `resume_offset=`, for example:
+```
+title	Arch
+linux	/vmlinuz-linux
+initrd	/amd-ucode.img
+initrd	/initramfs-linux.img
+options	root=UUID=f6b173de-c4ce-4ef4-8fa0-87d788dcd991 rw resume_offset=6391808
+```
+7. Create file in `/usr/local/bin/hibernate.sh`
 ```
 #!/bin/bash
 
 /usr/bin/acpi -b | /usr/bin/awk -F'[,:%]' '{print $2, $3}' | (
         read -r status capacity
-        if [ "$status" = Discharging ] && [ "$capacity" -lt 7 ]; then
+        if [ "$status" = Discharging ] && [ "$capacity" -lt 10 ]; then
                 /usr/bin/systemctl hibernate
         fi
 )
 ```
-6. Create file in `/etc/systemd/system/battery.service`
+8. Create file in `/etc/systemd/system/battery.service`
 ```
 [Unit]
 Description=Automatic hibernate
@@ -44,7 +57,7 @@ ExecStart=/usr/local/bin/hibernate.sh
 User=root
 Group=systemd-journal
 ```
-7. Create file in `/etc/systemd/system/battery.timer`
+9. Create file in `/etc/systemd/system/battery.timer`
 ```
 [Unit]
 Description=Periodical checking of battery status every two minutes
@@ -56,15 +69,19 @@ OnUnitActiveSec=2min
 [Install]
 WantedBy=battery.service
 ```
-8. Add hook `resume` before `autodetect`
+10. Add hook `resume` in `/etc/mkinitcpio.conf`
 ```
 HOOKS=(base systemd resume autodetect modconf block filesystems keyboard fsck)
 ```
-9. Then type in terminal
+11. Then type in terminal
 ```
 mkinitcpio -P
 ```
-11. Last, type this too.
+12. Give executable permission
+```
+chmod +x /usr/local/bin/hibernate.sh
+```
+13. Finally, enable the service.
 ```
 systemctl enable --now battery.{service,timer}
 ```
