@@ -1,5 +1,5 @@
 # arch-hibernate
-Automatic hibernate with systemd service & timer, with swapfile
+Automatic hibernating when lowbatt with systemd service & timer, swapfile also.
 
 0. Switch to root
 ```
